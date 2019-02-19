@@ -1,0 +1,185 @@
+<div *ngIf="alert.hasError || alert.hasSuccess"
+  [ngClass]="{'has-danger': alert.hasError ,  'has-success': alert.hasSuccess}"
+  class="alert alert-dismissible fade show text-center" role="alert">
+  <button type="button" (click)="alert.hasSuccess = false; alert.hasError = false;" class="close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <strong>{{ alert.hasMsg}}</strong>
+</div>
+<div class="col-12 table-conatiner">
+  <div class="row">
+    <div class="col-12" style="clear: both;">
+      <h3 class="flat-left header-content">Animal Records</h3>
+      <button (click)="addModal()" class="float-right btn btn-success add-btn">Add Animal</button>
+    </div>
+  </div>
+  <table style="width:100%" class="table table-hover table-sec">
+    <tr class="thead-dark">
+      <th>Sr. No.</th>
+      <th>Type</th>
+      <th>Category</th>
+      <th>Breed</th>
+      <th>Height</th>
+      <th>Weight</th>
+      <th>Food</th>
+      <th>Speed</th>
+      <th>Color</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+    <tr *ngFor="let animal of animalRecords;let i=index">
+      <td>{{((pageNo-1)*pageSize)+i+1}}</td>
+      <td>{{animal.type}}</td>
+      <td>{{animal.category}}</td>
+      <td>{{animal.breed}}</td>
+      <td>{{animal.height}}</td>
+      <td>{{animal.weight}}</td>
+      <td>{{animal.food}}</td>
+      <td>{{animal.speed}}</td>
+      <td>{{animal.color}}</td>
+      <td *ngIf="animal.isActive === true">Active</td>
+      <td *ngIf="animal.isActive === false">Deactive</td>
+      <td>
+        <i class="material-icons delete-icon" (click)="deleteModal(animal)">delete</i>
+        <i class="material-icons edit-icon" (click)="editModal(animal)">edit</i>
+      </td>
+    </tr>
+  </table>
+  <button class="float-right btn btn-primary prev-page-btn" *ngIf="pageNo > 1" (click)="prePage(animal)"> <span
+      aria-hidden="true">&laquo;</span> Previous Page</button>
+  <button class="float-right btn btn-primary next-page-btn" *ngIf="animalRecords.length == pageSize"
+    (click)="nextPage(animal)">Next Page <span aria-hidden="true">&raquo;</span></button>
+</div>
+<!-- The Modal -->
+<div id="updateModal" class="modal" *ngIf="showEditModal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 *ngIf="eidtStatus == false" class="add-animal-header">Add Animal</h5>
+      <h5 *ngIf="eidtStatus == true" class="edit-animal-header">Edit Animal</h5>
+      <h6 class="close has-dangers" (click)="hideModal()">&times;</h6>
+    </div>
+    <form novalidate [formGroup]="myform" (ngSubmit)="onSubmit(myform.value)">
+      <div class="modal-body">
+
+        <div class="form-group form-container" [ngClass]="{
+       'has-danger': type.invalid && (type.dirty || type.touched),
+       'has-success': type.valid && (type.dirty || type.touched)
+     }">
+          <label>Type : </label>
+          <input type="text" class="form-control" formControlName="type" maxlength="100" required>
+          <div class="form-control-feedback" *ngIf="type.errors && (type.dirty || type.touched)">
+            <p *ngIf="type.errors.required">Type is required</p>
+            <p *ngIf="type.errors.maxLength">Length should not more than 100</p>
+          </div>
+        </div>
+
+        <div class="form-group form-container" [ngClass]="{
+       'has-danger': category.invalid && (category.dirty || category.touched),
+       'has-success': category.valid && (category.dirty || category.touched)
+     }">
+          <label>Category : </label>
+          <input type="text" class="form-control" formControlName="category" maxlength="100" required>
+          <div class="form-control-feedback" *ngIf="category.errors && (category.dirty || category.touched)">
+            <p *ngIf="category.errors.required">Category is required</p>
+            <p *ngIf="category.errors.maxLength">Length should not more than 100</p>
+          </div>
+        </div>
+
+        <div class="form-group form-container" [ngClass]="{
+       'has-danger': breed.invalid && (breed.dirty || breed.touched),
+       'has-success': breed.valid && (breed.dirty || breed.touched)
+     }">
+          <label>Breed : </label>
+          <input type="text" class="form-control" formControlName="breed" maxlength="100" required>
+          <div class="form-control-feedback" *ngIf="breed.errors && (breed.dirty || breed.touched)">
+            <p *ngIf="breed.errors.required">Breed is required</p>
+            <p *ngIf="breed.errors.maxLength">Length should not more than 100</p>
+          </div>
+        </div>
+
+        <div class="form-group form-container" [ngClass]="{
+       'has-danger': height.invalid && (height.dirty || height.touched),
+       'has-success': height.valid && (height.dirty || height.touched)
+     }">
+          <label>Height : </label>
+          <input type="number" class="form-control" formControlName="height" max="1000" required>
+          <div class="form-control-feedback" *ngIf="height.errors && (height.dirty || height.touched)">
+            <p *ngIf="height.errors.required">Height is required</p>
+            <p *ngIf="height.errors.max">Not more than 1000</p>
+          </div>
+        </div>
+
+        <div class="form-group form-container" [ngClass]="{
+       'has-danger': weight.invalid && (weight.dirty || weight.touched),
+       'has-success': weight.valid && (weight.dirty || weight.touched)
+     }">
+          <label>Weight : </label>
+          <input type="number" class="form-control" formControlName="weight" max="1000" required>
+          <div class="form-control-feedback" *ngIf="weight.errors && (weight.dirty || weight.touched)">
+            <p *ngIf="weight.errors.required">Weight is required</p>
+            <p *ngIf="weight.errors.max">Not more than 1000</p>
+          </div>
+        </div>
+        <div class="form-group form-container" [ngClass]="{
+          'has-danger': food.invalid && (food.dirty || food.touched),
+          'has-success': food.valid && (food.dirty || food.touched)
+        }">
+          <label>Food : </label>
+          <input type="text" class="form-control" formControlName="food" maxlength="100" required>
+          <div class="form-control-feedback" *ngIf="food.errors && (food.dirty || food.touched)">
+            <p *ngIf="food.errors.required">Food is required</p>
+            <p *ngIf="food.errors.maxLength">Length should not more than 100</p>
+          </div>
+        </div>
+        <div class="form-group form-container" [ngClass]="{
+            'has-danger': speed.invalid && (speed.dirty || speed.touched),
+            'has-success': speed.valid && (speed.dirty || speed.touched)
+          }">
+          <label>Speed : </label>
+          <input type="number" class="form-control" formControlName="speed" max="1000" required>
+          <div class="form-control-feedback" *ngIf="speed.errors && (speed.dirty || speed.touched)">
+            <p *ngIf="speed.errors.required">Speed is required</p>
+            <p *ngIf="speed.errors.max">Not more than 1000</p>
+          </div>
+        </div>
+
+        <div class="form-group form-container" [ngClass]="{
+              'has-danger': color.invalid && (color.dirty || color.touched),
+              'has-success': color.valid && (color.dirty || color.touched)
+            }">
+          <label>Color : </label>
+          <input type="text" class="form-control" formControlName="color" maxlength="100" required>
+          <div class="form-control-feedback" *ngIf="color.errors && (color.dirty || color.touched)">
+            <p *ngIf="color.errors.required">Color is required</p>
+            <p *ngIf="color.errors.maxLength">Length should not more than 100</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" [disabled]="myform.invalid" *ngIf="eidtStatus == false"
+          class="btn btn-primary">Add</button>
+        <button type="submit" [disabled]="myform.invalid" *ngIf="eidtStatus == true"
+          class="btn btn-primary">Edit</button>
+        <button (click)="hideModal()" class="btn btn-light">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="deleteModal" class="modal" *ngIf="showDeleteModal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="add-animal-header">Delete Animal</h5>
+      <h6 class="close has-dangers" (click)="hideModal()">&times;</h6>
+    </div>
+    <div class="modal-body">
+      <h4>Are you sure want to delete animal ?</h4>
+    </div>
+    <div class="modal-footer">
+      <button (click)="confirmDelete()" class="btn btn-primary">Yes</button>
+      <button (click)="hideModal()" class="btn btn-light">No</button>
+    </div>
+  </div>
+</div>
